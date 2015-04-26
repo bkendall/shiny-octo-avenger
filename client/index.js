@@ -12,7 +12,8 @@ Client.prototype.getNodes = function (opts, cb) {
     cb = opts;
     opts = {};
   }
-  this.graph.get('nodes', cb);
+  opts = { qs: opts };
+  this.graph.get('nodes', opts, cb);
 };
 
 Client.prototype.getNode = function (value, cb) {
@@ -24,5 +25,30 @@ Client.prototype.createNode = function (value, cb) {
     cb = value;
     return cb(new Error('createNode takes a value'));
   }
-  this.graph.post('nodes', { json: true, body: { value: value } }, cb);
+  var opts = {
+    json: true,
+    body: { value: value }
+  };
+  this.graph.post('nodes', opts, cb);
 };
+
+Client.prototype.deleteNode = function (value, cb) {
+  if (isFunction(value)) {
+    cb = value;
+    return cb(new Error('deleteNode takes a value'));
+  }
+  this.graph.delete('nodes/' + value, cb);
+};
+
+Client.prototype.createEdge = function (from, label, to, cb) {
+  var opts = {
+    json: true,
+    body: {
+      from: from,
+      label: label,
+      to: to
+    }
+  };
+  this.graph.post('edges', opts, cb);
+};
+
