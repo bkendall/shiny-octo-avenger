@@ -1,0 +1,19 @@
+{
+  "name": "js-graph",
+  "version": "0.0.0",
+  "description": "graph database in javascript",
+  "main": "index.js",
+  "scripts": {
+    "test": "false"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/bkendall/shiny-octo-avenger.git"
+  },
+  "author": "Bryan Kendall <bryan@bryankendall.com>",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/bkendall/shiny-octo-avenger/issues"
+  },
+  "homepage": "https://github.com/bkendall/shiny-octo-avenger#readme"
+}
