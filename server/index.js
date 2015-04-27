@@ -32,9 +32,9 @@ function createEdge (from, label, to) {
   return e;
 }
 
-if (!envIs('test')) {
-  app.use(require('morgan')('combined'));
-}
+app.use(require('morgan')('combined', {
+  skip: function () { return envIs('test'); }
+}));
 app.use(require('body-parser').json());
 
 app.get('/nodes',
