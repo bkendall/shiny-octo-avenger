@@ -1,3 +1,5 @@
+'use strict';
+
 var express = require('express');
 var app = module.exports = express();
 
@@ -28,7 +30,7 @@ function createEdge (from, label, to) {
   };
   edges.push(e);
   return e;
-};
+}
 
 if (!envIs('test')) {
   app.use(require('morgan')('combined'));

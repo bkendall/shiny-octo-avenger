@@ -1,3 +1,5 @@
+'use strict';
+
 var SimpleApiClient = require('simple-api-client');
 var isFunction = require('101/is-function');
 

@@ -5,6 +5,7 @@
   "main": "index.js",
   "scripts": {
     "coverage": "lab --assert code --reporter lcov --output lcov.info test",
+    "lint": "eslint .",
     "start": "node server/index.js",
     "start-watch": "nodemon --watch server server/index.js",
     "test": "lab --assert code test",
