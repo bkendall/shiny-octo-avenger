@@ -40,7 +40,7 @@ app.use(require('body-parser').json());
 app.get('/nodes',
   function (req, res) {
     if (req.query.from && req.query.follow) {
-      var n = find(nodes, hasProps({ value: req.query.from }));
+      var n = find(nodes, hasProps({ id: req.query.from }));
       var _edges = edges.filter(hasProps({
         from: n.id,
         label: req.query.follow
@@ -64,7 +64,7 @@ app.post('/nodes',
 
 app.get('/nodes/:id',
   function (req, res) {
-    var n = find(nodes, hasProps({ value: req.params.id }));
+    var n = find(nodes, hasProps({ id: req.params.id }));
     if (!n) {
       res.sendStatus(404);
     } else {
@@ -74,7 +74,7 @@ app.get('/nodes/:id',
 
 app.delete('/nodes/:id',
   function (req, res) {
-    var n = findIndex(nodes, hasProps({ value: req.params.id }));
+    var n = findIndex(nodes, hasProps({ id: req.params.id }));
     if (n === -1) {
       res.sendStatus(404);
     } else {
@@ -85,8 +85,8 @@ app.delete('/nodes/:id',
 
 app.post('/edges',
   function (req, res) {
-    var n1 = find(nodes, hasProps({ value: req.body.from }));
-    var n2 = find(nodes, hasProps({ value: req.body.to }));
+    var n1 = find(nodes, hasProps({ id: req.body.from }));
+    var n2 = find(nodes, hasProps({ id: req.body.to }));
     var e = createEdge(n1.id, req.body.label, n2.id);
     res.status(201).json(e);
   });

@@ -19,6 +19,11 @@ lab.before(function (done) {
 lab.after(function (done) {
   s.close(done);
 });
+var ctx = {};
+// lab.afterEach(function (done) {
+//   Object.keys(ctx).forEach(function (k) { delete ctx[k]; });
+//   done();
+// });
 
 lab.describe('createNode error', function () {
   lab.it('should return an error', function (done) {
@@ -31,19 +36,25 @@ lab.describe('createNode error', function () {
 });
 
 lab.describe('createNode', function () {
-  var v = uuid();
-  lab.after(client.deleteNode.bind(client, v));
+  lab.before(function (done) {
+    ctx.v = uuid();
+    done();
+  });
+  lab.after(function (done) {
+    ctx.node.delete(done);
+  });
 
   lab.it('should create a node', function (done) {
     async.series([
-      client.createNode.bind(client, v),
-      client.getNodes.bind(client)
+      client.createNode.bind(client, ctx.v),
+      client.fetchNodes.bind(client)
     ], function (err, results) {
       expect(err).to.not.exist();
-      var nodes = results[1][1];
+      ctx.node = results[0];
+      var nodes = results[1];
       expect(nodes).to.have.length(1);
       expect(nodes[0]).to.deep.contain({
-        value: v
+        value: ctx.v
       });
       done();
     });
@@ -52,34 +63,38 @@ lab.describe('createNode', function () {
 
 lab.describe('deleteNode error', function () {
   lab.it('should return an error', function (done) {
-    client.deleteNode(function (err) {
+    client.newNode('value').delete(function (err) {
       expect(err).to.exist();
-      expect(err.message).to.match(/deleteNode takes a value/);
+      expect(err.message).to.match(/not delete node/i);
       done();
     });
   });
 
   lab.it('should send 404 for a node that does not exist', function (done) {
-    client.deleteNode('value', function (err, res) {
-      expect(err).to.not.exist();
-      expect(res.statusCode).to.equal(404);
-      expect(res.body).to.match(/not found/i);
+    client.newNode('value').delete(function (err) {
+      expect(err).to.exist();
+      expect(err.message).to.match(/not delete node/i);
       done();
     });
   });
 });
 
 lab.describe('deleteNode', function () {
-  var v = uuid();
-  lab.before(client.createNode.bind(client, v));
+  lab.before(function (done) {
+    ctx.v = uuid();
+    client.createNode(ctx.v, function (err, node) {
+      ctx.node = node;
+      done(err);
+    });
+  });
 
   lab.it('should delete a node', function (done) {
     async.series([
-      client.deleteNode.bind(client, v),
-      client.getNodes.bind(client)
+      ctx.node.delete.bind(ctx.node),
+      client.fetchNodes.bind(client)
     ], function (err, results) {
       expect(err).to.not.exist();
-      var nodes = results[1][1];
+      var nodes = results[1];
       expect(nodes).to.have.length(0);
       done();
     });
@@ -87,28 +102,33 @@ lab.describe('deleteNode', function () {
 });
 
 lab.describe('getNode errors', function () {
-  var v = uuid();
-
   lab.it('should not get a node that does not exist', function (done) {
-    client.getNode(v, function (err, res, body) {
-      expect(err).to.not.exist();
-      expect(res.statusCode).to.equal(404);
-      expect(body).to.match(/not found/i);
+    ctx.v = uuid();
+    client.newNode(ctx.v).fetch(function (err) {
+      expect(err).to.exist();
+      expect(err.message).to.match(/not fetch node/i);
       done();
     });
   });
 });
 
 lab.describe('getNode', function () {
-  var v = uuid();
-  lab.before(client.createNode.bind(client, v));
-  lab.after(client.deleteNode.bind(client, v));
+  lab.before(function (done) { ctx.v = uuid(); done(); });
+  lab.before(function (done) {
+    client.createNode(ctx.v, function (err, node) {
+      ctx.node = node;
+      done(err);
+    });
+  });
+  lab.after(function (done) {
+    ctx.node.delete(done);
+  });
 
   lab.it('should get a node', function (done) {
-    client.getNode(v, function (err, res, body) {
+    client.newNode({ id: ctx.node.id }).fetch(function (err, node) {
       expect(err).to.not.exist();
-      expect(body).to.deep.contain({
-        value: v
+      expect(node).to.deep.contain({
+        value: ctx.v
       });
       done();
     });
@@ -116,22 +136,44 @@ lab.describe('getNode', function () {
 });
 
 lab.describe('getNodes', function () {
-  var v1 = uuid();
-  var v2 = uuid();
-  lab.before(client.createNode.bind(client, v1));
-  lab.after(client.deleteNode.bind(client, v1));
+  lab.before(function (done) {
+    ctx.v1 = uuid();
+    client.createNode(ctx.v1, function (err, node) {
+      ctx.node1 = node;
+      done(err);
+    });
+  });
+  lab.before(function (done) {
+    ctx.v2 = uuid();
+    client.createNode(ctx.v2, function (err, node) {
+      ctx.node2 = node;
+      done(err);
+    });
+  });
+  lab.after(function (done) {
+    ctx.node1.delete(done);
+  });
+  lab.after(function (done) {
+    ctx.node2.delete(done);
+  });
 
   lab.describe('when edges are around', function () {
-    lab.before(client.createEdge.bind(client, v1, 'dependsOn', v2));
+    lab.before(function (done) {
+      client.createEdge(
+        ctx.node1,
+        'dependsOn',
+        ctx.node2,
+        done);
+    });
 
-    lab.it('should list empty for no end node existing', function (done) {
+    lab.it('should follow edges', function (done) {
       var opts = {
-        from: v1,
+        from: ctx.node1.id,
         follow: 'dependsOn'
       };
-      client.getNodes(opts, function (err, res, body) {
+      client.fetchNodes(opts, function (err, nodes) {
         expect(err).to.not.exist();
-        expect(body).to.have.length(0);
+        expect(nodes).to.have.length(1);
         done();
       });
     });
@@ -139,22 +181,40 @@ lab.describe('getNodes', function () {
 });
 
 lab.describe('deleteNode', function () {
-  var v1 = uuid();
-  var v2 = uuid();
-  lab.before(client.createNode.bind(client, v1));
-  lab.after(client.deleteNode.bind(client, v1));
+  lab.before(function (done) {
+    ctx.v1 = uuid();
+    client.createNode(ctx.v1, function (err, node) {
+      ctx.node1 = node;
+      done(err);
+    });
+  });
+  lab.before(function (done) {
+    ctx.v2 = uuid();
+    client.createNode(ctx.v2, function (err, node) {
+      ctx.node2 = node;
+      done(err);
+    });
+  });
+  lab.after(function (done) {
+    ctx.node1.delete(done);
+  });
+  lab.after(function (done) {
+    ctx.node2.delete(done);
+  });
 
   lab.describe('when edges are around', function () {
-    lab.before(client.createEdge.bind(client, v1, 'dependsOn', v2));
+    lab.before(function (done) {
+      client.createEdge(ctx.node1, 'dependsOn', ctx.node2, done);
+    });
 
     lab.it('should list empty for no edge existing', function (done) {
       var opts = {
-        from: v1,
-        follow: 'dependsOn'
+        from: ctx.node1.id,
+        follow: 'friendsWith'
       };
-      client.getNodes(opts, function (err, res, body) {
+      client.fetchNodes(opts, function (err, nodes) {
         expect(err).to.not.exist();
-        expect(body).to.have.length(0);
+        expect(nodes).to.have.length(0);
         done();
       });
     });
@@ -162,25 +222,42 @@ lab.describe('deleteNode', function () {
 });
 
 lab.describe('createEdge', function () {
-  var v1 = uuid();
-  var v2 = uuid();
-  lab.before(client.createNode.bind(client, v1));
-  lab.before(client.createNode.bind(client, v2));
-  lab.after(client.createNode.bind(client, v1));
-  lab.after(client.createNode.bind(client, v2));
+  lab.before(function (done) {
+    ctx.v1 = uuid();
+    client.createNode(ctx.v1, function (err, node) {
+      ctx.node1 = node;
+      done(err);
+    });
+  });
+  lab.before(function (done) {
+    ctx.v2 = uuid();
+    client.createNode(ctx.v2, function (err, node) {
+      ctx.node2 = node;
+      done(err);
+    });
+  });
+  lab.after(function (done) {
+    ctx.node1.delete(done);
+  });
+  lab.after(function (done) {
+    ctx.node2.delete(done);
+  });
 
   lab.it('should create an edge', function (done) {
     async.series([
-      client.createEdge.bind(client, v1, 'dependsOn', v2),
-      client.getNodes.bind(client, { from: v1, follow: 'dependsOn' })
+      client.createEdge.bind(client,
+        ctx.node1, 'dependsOn', ctx.node2),
+      client.fetchNodes.bind(client,
+        { from: ctx.node1.id, follow: 'dependsOn' })
     ], function (err, results) {
       expect(err).to.not.exist();
-      var nodes = results[1][1];
+      var nodes = results[1];
       expect(nodes).to.have.length(1);
       expect(nodes[0]).to.deep.contain({
-        value: v2
+        value: ctx.v2
       });
       done();
     });
   });
 });
+
