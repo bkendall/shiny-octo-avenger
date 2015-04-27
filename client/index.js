@@ -3,6 +3,9 @@
 var SimpleApiClient = require('simple-api-client');
 var isFunction = require('101/is-function');
 
+var Edge = require('./edge');
+var Node = require('./node');
+
 module.exports = Client;
 
 function Client (host) {
@@ -49,42 +52,6 @@ Client.prototype.createNode = function (value, cb) {
 Client.prototype.newNode = function (opts) {
   return new Node(opts, this.graph);
 };
-
-function Node (opts, graph) {
-  this.id = opts.id;
-  this.value = opts.value;
-  this.graph = graph;
-}
-
-Node.prototype.fetch = function (cb) {
-  var self = this;
-  this.graph.get('nodes/' + this.id, function (err, res, body) {
-    if (err) {
-      return cb(err);
-    } else if (res.statusCode !== 200) {
-      return cb(new Error('could not fetch node'));
-    }
-    cb(null, new Node(body, self.graph));
-  });
-};
-
-Node.prototype.delete = function (cb) {
-  this.graph.delete('nodes/' + this.id, function (err, res) {
-    if (err) {
-      return cb(err);
-    } else if (res.statusCode !== 204) {
-      return cb(new Error('could not delete node'));
-    }
-    cb(null);
-  });
-};
-
-function Edge (opts, graph) {
-  this.from = opts.from;
-  this.label = opts.label;
-  this.to = opts.to;
-  this.graph = graph;
-}
 
 Client.prototype.createEdge = function (from, label, to, cb) {
   var opts = {
