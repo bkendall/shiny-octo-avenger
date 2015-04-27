@@ -39,9 +39,10 @@ app.get('/nodes',
   function (req, res) {
     if (req.query.from && req.query.follow) {
       var n = find(nodes, hasProps({ value: req.query.from }));
-      var _edges = edges.filter(function (e) {
-        return e.from === n.id && e.label === req.query.follow;
-      });
+      var _edges = edges.filter(hasProps({
+        from: n.id,
+        label: req.query.follow
+      }));
       var foundNodes = _edges.reduce(function (memo, e) {
         var _n = find(nodes, hasProps({ id: e.to }));
         if (_n) { memo.push(_n); }
