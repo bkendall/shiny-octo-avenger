@@ -51,3 +51,12 @@ app.post('/edges',
   edge.new('from.id', 'body.label', 'to.id'),
   mw.res.status(201), mw.res.json('edge'));
 
+app.use(function boomErrorHandler (err, req, res, next) {
+  if (err.isBoom) {
+    res.status(err.output.statusCode);
+    res.json(err.output.payload);
+  } else {
+    next(err);
+  }
+});
+
