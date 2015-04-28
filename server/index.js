@@ -4,33 +4,11 @@ var express = require('express');
 var app = module.exports = express();
 
 var envIs = require('101/env-is');
-var find = require('101/find');
-var findIndex = require('101/find-index');
-var hasProps = require('101/has-properties');
-var uuid = require('uuid');
+var middlewarize = require('middlewarize');
+var mw = require('dat-middleware');
 
-var nodes = [];
-var edges = [];
-
-function createNode (value) {
-  var n = {
-    id: uuid(),
-    value: value
-  };
-  nodes.push(n);
-  return n;
-}
-
-function createEdge (from, label, to) {
-  var e = {
-    id: uuid(),
-    from: from,
-    label: label,
-    to: to
-  };
-  edges.push(e);
-  return e;
-}
+var node = middlewarize(require('./lib/node'));
+var edge = middlewarize(require('./lib/edge'));
 
 app.use(require('morgan')('combined', {
   skip: function () { return envIs('test'); }
@@ -38,56 +16,38 @@ app.use(require('morgan')('combined', {
 app.use(require('body-parser').json());
 
 app.get('/nodes',
-  function (req, res) {
-    if (req.query.from && req.query.follow) {
-      var n = find(nodes, hasProps({ id: req.query.from }));
-      var _edges = edges.filter(hasProps({
-        from: n.id,
-        label: req.query.follow
-      }));
-      var foundNodes = _edges.reduce(function (memo, e) {
-        var _n = find(nodes, hasProps({ id: e.to }));
-        if (_n) { memo.push(_n); }
-        return memo;
-      }, []);
-      res.json(foundNodes);
-    } else {
-      res.json(nodes);
-    }
-  });
+  mw.query('from', 'follow').pick().string().require().then(
+    node.find({ id: 'query.from' }, 'cb').async('node'),
+    edge.follow('node.id', 'query.follow', 'cb').async('edges'),
+    node.findFromEdges('edges', 'cb').async('nodes'),
+    mw.res.json('nodes')),
+  node.find({}, 'cb').async('nodes'),
+  mw.res.json('nodes'));
 
 app.post('/nodes',
-  function (req, res) {
-    var n = createNode(req.body.value);
-    res.status(201).json(n);
-  });
+  mw.body('value').pick().require().string(),
+  node.new('body.value'),
+  mw.res.status(201), mw.res.json('node'));
 
 app.get('/nodes/:id',
-  function (req, res) {
-    var n = find(nodes, hasProps({ id: req.params.id }));
-    if (!n) {
-      res.sendStatus(404);
-    } else {
-      res.status(200).json(n);
-    }
-  });
+  mw.params('id').pick().require().string(),
+  node.find({ id: 'params.id' }, 'cb').async('node'),
+  mw.req('node').require(),
+  mw.res.json('node'));
 
 app.delete('/nodes/:id',
-  function (req, res) {
-    var n = findIndex(nodes, hasProps({ id: req.params.id }));
-    if (n === -1) {
-      res.sendStatus(404);
-    } else {
-      nodes.splice(n, 1);
-      res.sendStatus(204);
-    }
-  });
+  mw.params('id').pick().require().string(),
+  node.find({ id: 'params.id' }, 'cb').async('node'),
+  mw.req('node').require(),
+  node.instance.delete('cb'),
+  mw.res.status(204),
+  mw.res.end());
 
 app.post('/edges',
-  function (req, res) {
-    var n1 = find(nodes, hasProps({ id: req.body.from }));
-    var n2 = find(nodes, hasProps({ id: req.body.to }));
-    var e = createEdge(n1.id, req.body.label, n2.id);
-    res.status(201).json(e);
-  });
+  mw.body('from', 'label', 'to').pick().require().string(),
+  node.find({ id: 'body.from' }, 'cb').async('from'),
+  node.find({ id: 'body.to' }, 'cb').async('to'),
+  mw.req('from', 'to').require(),
+  edge.new('from.id', 'body.label', 'to.id'),
+  mw.res.status(201), mw.res.json('edge'));
 
