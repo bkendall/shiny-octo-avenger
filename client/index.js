@@ -3,8 +3,8 @@
 var SimpleApiClient = require('simple-api-client');
 var isFunction = require('101/is-function');
 
-var Edge = require('./edge');
-var Node = require('./node');
+var Edge = require('./lib/edge');
+var Node = require('./lib/node');
 
 module.exports = Client;
 
