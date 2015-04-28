@@ -8,5 +8,3 @@ function Edge (opts, graph) {
   assign(this, opts, { graph: graph });
 }
 
-Edge.name = 'edge';
-
