@@ -62,7 +62,7 @@ function handleCreate (Entity, graph, cb) {
     if (err) {
       return cb(err);
     } else if (res.statusCode !== 201) {
-      return cb(new Error('could not create ' + (Entity.name || 'entity')));
+      return cb(new Error('could not create ' + Entity.name));
     }
     cb(null, new Entity(body, graph));
   };

@@ -20,13 +20,17 @@ lab.after(function (done) {
   s.close(done);
 });
 var ctx = {};
-// lab.afterEach(function (done) {
-//   Object.keys(ctx).forEach(function (k) { delete ctx[k]; });
-//   done();
-// });
 
 lab.describe('createNode error', function () {
-  lab.it('should return an error', function (done) {
+  lab.it('if no non-string value provided', function (done) {
+    client.createNode(true, function (err) {
+      expect(err).to.exist();
+      expect(err.message).to.match(/could not create node/i);
+      done();
+    });
+  });
+
+  lab.it('if no value provided', function (done) {
     client.createNode(function (err) {
       expect(err).to.exist();
       expect(err.message).to.match(/createNode takes a value/);
@@ -154,6 +158,7 @@ lab.describe('getNodes', function () {
     ctx.node1.delete(done);
   });
   lab.after(function (done) {
+    if (!ctx.node2) { return done(); }
     ctx.node2.delete(done);
   });
 
@@ -174,6 +179,26 @@ lab.describe('getNodes', function () {
       client.fetchNodes(opts, function (err, nodes) {
         expect(err).to.not.exist();
         expect(nodes).to.have.length(1);
+        done();
+      });
+    });
+  });
+
+  lab.describe('if a node was deleted', function () {
+    lab.before(function (done) {
+      var node2 = ctx.node2;
+      delete ctx.node2;
+      node2.delete(done);
+    });
+
+    lab.it('should not return any nodes', function (done) {
+      var opts = {
+        from: ctx.node1.id,
+        follow: 'dependsOn'
+      };
+      client.fetchNodes(opts, function (err, nodes) {
+        expect(err).to.not.exist();
+        expect(nodes).to.have.length(0);
         done();
       });
     });
