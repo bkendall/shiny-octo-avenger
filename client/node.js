@@ -1,11 +1,11 @@
 'use strict';
 
+var assign = require('object-assign');
+
 module.exports = Node;
 
 function Node (opts, graph) {
-  this.id = opts.id;
-  this.value = opts.value;
-  this.graph = graph;
+  assign(this, opts, { graph: graph });
 }
 
 Node.prototype.fetch = function (cb) {

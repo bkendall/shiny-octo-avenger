@@ -38,15 +38,7 @@ Client.prototype.createNode = function (value, cb) {
     json: true,
     body: { value: value }
   };
-  var self = this;
-  this.graph.post('nodes', opts, function (err, res, body) {
-    if (err) {
-      return cb(err);
-    } else if (res.statusCode !== 201) {
-      return cb(new Error('could not create node'));
-    }
-    cb(null, new Node(body, self.graph));
-  });
+  this.graph.post('nodes', opts, handleCreate(Node, this.graph, cb));
 };
 
 Client.prototype.newNode = function (opts) {
@@ -62,14 +54,17 @@ Client.prototype.createEdge = function (from, label, to, cb) {
       to: to.id
     }
   };
-  var self = this;
-  this.graph.post('edges', opts, function (err, res, body) {
+  this.graph.post('edges', opts, handleCreate(Edge, this.graph, cb));
+};
+
+function handleCreate (Entity, graph, cb) {
+  return function (err, res, body) {
     if (err) {
       return cb(err);
     } else if (res.statusCode !== 201) {
-      return cb(new Error('could not create edge'));
+      return cb(new Error('could not create ' + (Entity.name || 'entity')));
     }
-    cb(null, new Edge(body, self.graph));
-  });
-};
+    cb(null, new Entity(body, graph));
+  };
+}
 

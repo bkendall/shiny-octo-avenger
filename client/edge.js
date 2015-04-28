@@ -1,11 +1,12 @@
 'use strict';
 
+var assign = require('object-assign');
+
 module.exports = Edge;
 
 function Edge (opts, graph) {
-  this.from = opts.from;
-  this.label = opts.label;
-  this.to = opts.to;
-  this.graph = graph;
+  assign(this, opts, { graph: graph });
 }
+
+Edge.name = 'edge';
 
