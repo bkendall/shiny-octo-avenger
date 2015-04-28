@@ -245,6 +245,38 @@ lab.describe('deleteNode', function () {
     });
   });
 });
+lab.describe('createEdge error', function () {
+  lab.before(function (done) {
+    ctx.v1 = uuid();
+    client.createNode(ctx.v1, function (err, node) {
+      ctx.node1 = node;
+      done(err);
+    });
+  });
+  lab.before(function (done) {
+    ctx.v2 = uuid();
+    client.createNode(ctx.v2, function (err, node) {
+      ctx.node2 = node;
+      done(err);
+    });
+  });
+  lab.after(function (done) {
+    ctx.node1.delete(done);
+  });
+
+  lab.it('when looking for a node that does not exist', function (done) {
+    var node2 = ctx.node2;
+    async.series([
+      ctx.node2.delete.bind(ctx.node2),
+      client.createEdge.bind(client,
+        ctx.node1, 'dependsOn', node2)
+    ], function (err) {
+      expect(err).to.exist();
+      expect(err.message).to.match(/not create edge/i);
+      done();
+    });
+  });
+});
 
 lab.describe('createEdge', function () {
   lab.before(function (done) {
