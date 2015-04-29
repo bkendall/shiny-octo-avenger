@@ -53,12 +53,11 @@ app.post('/edges',
   edge.new('from.id', 'body.label', 'to.id'),
   mw.res.status(201), mw.res.json('edge'));
 
-app.use(function boomErrorHandler (err, req, res, next) {
-  if (err.isBoom) {
-    res.status(err.output.statusCode);
-    res.json(err.output.payload);
-  } else {
-    next(err);
+app.use(boomError);
+function boomError (err, req, res, next) { // eslint-disable-line no-unused-vars
+  if (!err.isBoom) {
+    err = mw.Boom.wrap(err, 500, 'Server Error');
   }
-});
-
+  res.status(err.output.statusCode);
+  res.json(err.output.payload);
+}
