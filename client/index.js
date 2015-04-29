@@ -23,20 +23,27 @@ Client.prototype.fetchNodes = function (opts, cb) {
     if (err) {
       return cb(err);
     } else if (res.statusCode !== 200) {
-      return cb(new Error('could not get nodes'));
+      return cb(new Error('could not get nodes: ' + body.message));
     }
     cb(null, body.map(function (o) { return new Node(o, self.graph); }));
   });
 };
 
-Client.prototype.createNode = function (value, cb) {
+Client.prototype.createNode = function (label, value, cb) {
+  if (isFunction(label)) {
+    value = label;
+    label = null;
+  }
   if (isFunction(value)) {
     cb = value;
-    return cb(new Error('createNode takes a value'));
+    value = null;
   }
   var opts = {
     json: true,
-    body: { value: value }
+    body: {
+      label: label,
+      value: value
+    }
   };
   this.graph.post('nodes', opts, handleCreate(Node, this.graph, cb));
 };

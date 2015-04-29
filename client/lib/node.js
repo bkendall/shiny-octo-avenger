@@ -21,11 +21,11 @@ Node.prototype.fetch = function (cb) {
 };
 
 Node.prototype.delete = function (cb) {
-  this.graph.delete('nodes/' + this.id, function (err, res) {
+  this.graph.delete('nodes/' + this.id, function (err, res, body) {
     if (err) {
       return cb(err);
     } else if (res.statusCode !== 204) {
-      return cb(new Error('could not delete node'));
+      return cb(new Error('could not delete node: ' + body.message));
     }
     cb(null);
   });
