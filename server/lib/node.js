@@ -11,19 +11,28 @@ module.exports = Node;
 
 var nodes = [];
 
-function Node (value) {
+function Node (label, value) {
   assign(this, {
     id: uuid(),
+    label: label,
     value: value
   });
   nodes.push(this);
 }
 
+Node.findOne = function (opts, cb) {
+  this.find(opts, function (err, _nodes) {
+    if (err) { return cb(err); }
+    var n = _nodes.length ? _nodes[0] : null;
+    cb(null, n);
+  });
+};
+
 Node.find = function (opts, cb) {
   if (Object.keys(opts).length === 0) {
     return cb(null, nodes);
   }
-  var n = find(nodes, hasProps(opts));
+  var n = nodes.filter(hasProps(opts));
   if (!n) {
     cb(mw.Boom.notFound('node does not exist'));
   } else {

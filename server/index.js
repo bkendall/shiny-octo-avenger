@@ -16,28 +16,30 @@ app.use(require('morgan')('combined', {
 app.use(require('body-parser').json());
 
 app.get('/nodes',
-  mw.query('from', 'follow').pick().string().require().then(
-    node.find({ id: 'query.from' }, 'cb').async('node'),
+  mw.query({ or: [ 'from', 'follow' ] }).require().then(
+    mw.query('from', 'follow').pick().require().string(),
+    node.findOne({ id: 'query.from' }, 'cb').async('node'),
     edge.follow('node.id', 'query.follow', 'cb').async('edges'),
     node.findFromEdges('edges', 'cb').async('nodes'),
     mw.res.json('nodes')),
-  node.find({}, 'cb').async('nodes'),
+  mw.query({ or: [ 'label', 'value', 'id' ] }).pick().require().string(),
+  node.find('query', 'cb').async('nodes'),
   mw.res.json('nodes'));
 
 app.post('/nodes',
-  mw.body('value').pick().require().string(),
-  node.new('body.value'),
+  mw.body('label', 'value').pick().require().string(),
+  node.new('body.label', 'body.value'),
   mw.res.status(201), mw.res.json('node'));
 
 app.get('/nodes/:id',
   mw.params('id').pick().require().string(),
-  node.find({ id: 'params.id' }, 'cb').async('node'),
+  node.findOne({ id: 'params.id' }, 'cb').async('node'),
   mw.req('node').require(),
   mw.res.json('node'));
 
 app.delete('/nodes/:id',
   mw.params('id').pick().require().string(),
-  node.find({ id: 'params.id' }, 'cb').async('node'),
+  node.findOne({ id: 'params.id' }, 'cb').async('node'),
   mw.req('node').require(),
   node.instance.delete('cb'),
   mw.res.status(204),
@@ -45,8 +47,8 @@ app.delete('/nodes/:id',
 
 app.post('/edges',
   mw.body('from', 'label', 'to').pick().require().string(),
-  node.find({ id: 'body.from' }, 'cb').async('from'),
-  node.find({ id: 'body.to' }, 'cb').async('to'),
+  node.findOne({ id: 'body.from' }, 'cb').async('from'),
+  node.findOne({ id: 'body.to' }, 'cb').async('to'),
   mw.req('from', 'to').require(),
   edge.new('from.id', 'body.label', 'to.id'),
   mw.res.status(201), mw.res.json('edge'));
