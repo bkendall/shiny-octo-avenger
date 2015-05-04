@@ -1,10 +1,9 @@
 'use strict';
 
 var assign = require('object-assign');
-var find = require('101/find');
 var findIndex = require('101/find-index');
 var hasProps = require('101/has-properties');
-var mw = require('dat-middleware');
+var boom = require('boom');
 var uuid = require('uuid');
 
 module.exports = Node;
@@ -22,9 +21,7 @@ function Node (label, value) {
 
 Node.findOne = function (opts, cb) {
   this.find(opts, function (err, _nodes) {
-    if (err) { return cb(err); }
-    var n = _nodes.length ? _nodes[0] : null;
-    cb(null, n);
+    cb(err, err ? null : _nodes[0]);
   });
 };
 
@@ -33,20 +30,11 @@ Node.find = function (opts, cb) {
     return cb(null, nodes);
   }
   var n = nodes.filter(hasProps(opts));
-  if (!n) {
-    cb(mw.Boom.notFound('node does not exist'));
+  if (!n.length) {
+    cb(boom.notFound('node does not exist'));
   } else {
     cb(null, n);
   }
-};
-
-Node.findFromAssociations = function (_associations, cb) {
-  var foundNodes = _associations.reduce(function (memo, e) {
-    var n = find(nodes, hasProps({ id: e.to }));
-    if (n) { memo.push(n); }
-    return memo;
-  }, []);
-  cb(null, foundNodes);
 };
 
 Node.prototype.delete = function (cb) {

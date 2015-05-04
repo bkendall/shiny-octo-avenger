@@ -51,5 +51,39 @@ describe('Node static functions', function () {
         expect(nodes.length).toEqual(1);
       });
     });
+
+    it('should find nodes with opts', function () {
+      Node.find({ id: n.id }, function (err, nodes) {
+        expect(err).toBeFalsy();
+        expect(nodes).toBeTruthy();
+        expect(nodes.length).toEqual(1);
+      });
+    });
+
+    it('should return an error if not found', function () {
+      Node.find({ id: '' }, function (err) {
+        expect(err).toBeTruthy();
+        expect(err.isBoom).toEqual(true);
+        expect(err.output.statusCode).toEqual(404);
+      });
+    });
+  });
+
+  describe('findOne', function () {
+    it('should error if not found', function () {
+      Node.findOne({ id: '' }, function (err) {
+        expect(err).toBeTruthy();
+        expect(err.isBoom).toEqual(true);
+        expect(err.output.statusCode).toEqual(404);
+      });
+    });
+
+    it('should find a node', function () {
+      Node.findOne({ id: n.id }, function (err, node) {
+        expect(err).toBeFalsy();
+        expect(node).toBeTruthy();
+        expect(node.id).toEqual(n.id);
+      });
+    });
   });
 });
