@@ -8,7 +8,7 @@
     "lint": "eslint .",
     "start": "node server/index.js",
     "start-watch": "nodemon --watch server server/index.js",
-    "test": "lab --assert code test",
+    "test": "lab --assert code",
     "test-watch": "nodemon --watch . ./node_modules/.bin/lab --assert code test"
   },
   "repository": {
