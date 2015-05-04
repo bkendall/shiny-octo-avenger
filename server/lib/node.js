@@ -40,8 +40,8 @@ Node.find = function (opts, cb) {
   }
 };
 
-Node.findFromEdges = function (_edges, cb) {
-  var foundNodes = _edges.reduce(function (memo, e) {
+Node.findFromAssociations = function (_associations, cb) {
+  var foundNodes = _associations.reduce(function (memo, e) {
     var n = find(nodes, hasProps({ id: e.to }));
     if (n) { memo.push(n); }
     return memo;

@@ -2,8 +2,9 @@
 
 var SimpleApiClient = require('simple-api-client');
 var isFunction = require('101/is-function');
+var isObject = require('101/is-object');
 
-var Edge = require('./lib/edge');
+var Association = require('./lib/association');
 var Node = require('./lib/node');
 
 module.exports = Client;
@@ -12,20 +13,19 @@ function Client (host) {
   this.graph = new SimpleApiClient('http://' + host);
 }
 
-Client.prototype.fetchNodes = function (opts, cb) {
+Client.prototype.fetchAssociations = function (opts, cb) {
   if (isFunction(opts)) {
     cb = opts;
     opts = {};
   }
   opts = { qs: opts };
-  var self = this;
-  this.graph.get('nodes', opts, function (err, res, body) {
+  this.graph.get('associations', opts, function (err, res, body) {
     if (err) {
       return cb(err);
     } else if (res.statusCode !== 200) {
-      return cb(new Error('could not get nodes: ' + body.message));
+      return cb(new Error('could not get associations: ' + body.message));
     }
-    cb(null, body.map(function (o) { return new Node(o, self.graph); }));
+    cb(null, body);
   });
 };
 
@@ -52,16 +52,23 @@ Client.prototype.newNode = function (opts) {
   return new Node(opts, this.graph);
 };
 
-Client.prototype.createEdge = function (from, label, to, cb) {
+Client.prototype.createAssociation = function (from, label, to, cb) {
+  if (isObject(from) && from.id) {
+    from = from.id;
+  }
+  if (isObject(to) && to.id) {
+    to = to.id;
+  }
   var opts = {
     json: true,
     body: {
-      from: from.id,
+      from: from,
       label: label,
-      to: to.id
+      to: to
     }
   };
-  this.graph.post('edges', opts, handleCreate(Edge, this.graph, cb));
+  this.graph.post('associations', opts,
+    handleCreate(Association, this.graph, cb));
 };
 
 function handleCreate (Entity, graph, cb) {

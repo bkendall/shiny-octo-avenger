@@ -2,9 +2,9 @@
 
 var assign = require('object-assign');
 
-module.exports = Edge;
+module.exports = Association;
 
-function Edge (opts, graph) {
+function Association (opts, graph) {
   assign(this, opts, { graph: graph });
 }
 

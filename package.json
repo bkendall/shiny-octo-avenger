@@ -8,8 +8,10 @@
     "lint": "eslint .",
     "start": "node server/index.js",
     "start-watch": "nodemon --watch server server/index.js",
+    "unit": "jest",
+    "unit-watch": "nodemon --watch . ./node_modules/.bin/jest",
     "test": "lab --assert code",
-    "test-watch": "nodemon --watch . ./node_modules/.bin/lab --assert code test"
+    "test-watch": "nodemon --watch . ./node_modules/.bin/lab --assert code"
   },
   "repository": {
     "type": "git",
@@ -36,7 +38,15 @@
     "async": "^0.9.0",
     "code": "^1.4.0",
     "eslint": "^0.20.0",
+    "jest-cli": "^0.4.0",
     "lab": "^5.7.0",
     "nodemon": "^1.3.7"
+  },
+  "jest": {
+    "unmockedModulePathPatterns": [
+      "uuid",
+      "object-assign",
+      "^101/.+"
+    ]
   }
 }
