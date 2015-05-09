@@ -12,6 +12,9 @@ var Client = graph.client;
 var port = 3080;
 var client = new Client('127.0.0.1:' + port);
 
+var SimpleApiClient = require('simple-api-client');
+var sinon = require('sinon');
+
 var s;
 lab.before(function (done) {
   s = server.listen(port, done);
@@ -43,6 +46,17 @@ lab.describe('client tests', function () {
       client.createNode('label', function (err) {
         expect(err).to.exist();
         expect(err.message).to.match(/could not create node/i);
+        done();
+      });
+    });
+
+    lab.it('if cannot connect to graph', function (done) {
+      sinon.stub(SimpleApiClient.prototype, 'post')
+        .yieldsAsync(new Error('ERRCONN'));
+      client.createNode('label', 'value', function (err) {
+        expect(err).to.exist();
+        expect(err.message).to.match(/errcon/i);
+        SimpleApiClient.prototype.post.restore();
         done();
       });
     });
@@ -78,9 +92,28 @@ lab.describe('client tests', function () {
 
   lab.describe('deleteNode error', function () {
     lab.it('for a node that does not exist', function (done) {
-      client.newNode('label', 'value').delete(function (err) {
+      var opts = {
+        label: 'label',
+        value: 'value'
+      };
+      client.newNode(opts).delete(function (err) {
         expect(err).to.exist();
         expect(err.message).to.match(/not delete node/i);
+        done();
+      });
+    });
+
+    lab.it('when cannot connect to server', function (done) {
+      sinon.stub(SimpleApiClient.prototype, 'delete')
+        .yieldsAsync(new Error('ERRCONN'));
+      var opts = {
+        label: 'label',
+        value: 'value'
+      };
+      client.newNode(opts).delete(function (err) {
+        expect(err).to.exist();
+        expect(err.message).to.match(/ERRCONN/i);
+        SimpleApiClient.prototype.delete.restore();
         done();
       });
     });
@@ -106,6 +139,17 @@ lab.describe('client tests', function () {
       client.newNode({ id: uuid() }).fetch(function (err) {
         expect(err).to.exist();
         expect(err.message).to.match(/not fetch node/i);
+        done();
+      });
+    });
+
+    lab.it('when cannot connect to server', function (done) {
+      sinon.stub(SimpleApiClient.prototype, 'get')
+        .yieldsAsync(new Error('ERRCONN'));
+      client.newNode({ id: uuid() }).fetch(function (err) {
+        expect(err).to.exist();
+        expect(err.message).to.match(/ERRCONN/i);
+        SimpleApiClient.prototype.get.restore();
         done();
       });
     });
@@ -138,7 +182,7 @@ lab.describe('client tests', function () {
     });
   });
 
-  lab.describe('getNodes', function () {
+  lab.describe('fetchAssociations', function () {
     lab.before(function (done) {
       ctx.v1 = uuid();
       ctx.l = 'node';
@@ -160,6 +204,27 @@ lab.describe('client tests', function () {
     lab.after(function (done) {
       if (!ctx.node2) { return done(); }
       ctx.node2.delete(done);
+    });
+
+    lab.describe('errors', function () {
+      lab.it('when no opts provided', function (done) {
+        client.fetchAssociations(function (err) {
+          expect(err).to.exist();
+          expect(err.message).to.match(/could not get associations/i);
+          done();
+        });
+      });
+      lab.it('when cannot connect to server', function (done) {
+        sinon.stub(SimpleApiClient.prototype, 'get')
+          .yieldsAsync(new Error('ERRCONN'));
+        client.fetchAssociations(function (err) {
+          expect(err).to.exist();
+          expect(err.message).to.match(/errcon/i);
+          expect(SimpleApiClient.prototype.get.callCount).to.equal(1);
+          SimpleApiClient.prototype.get.restore();
+          done();
+        });
+      });
     });
 
     lab.describe('when associations are around', function () {
