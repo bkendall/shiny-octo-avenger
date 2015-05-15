@@ -21,7 +21,7 @@
   },
   "homepage": "https://github.com/bkendall/shiny-octo-avenger#readme",
   "dependencies": {
-    "101": "^0.16.1",
+    "101": "^0.18.0",
     "body-parser": "^1.12.3",
     "boom": "^2.7.1",
     "dat-middleware": "^1.10.3",
@@ -35,7 +35,7 @@
   "devDependencies": {
     "async": "^0.9.0",
     "code": "^1.4.0",
-    "eslint": "^0.20.0",
+    "eslint": "^0.21.0",
     "jest-cli": "^0.4.0",
     "lab": "^5.7.0",
     "nodemon": "^1.3.7",
