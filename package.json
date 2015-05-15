@@ -4,14 +4,11 @@
   "description": "graph database in javascript",
   "main": "index.js",
   "scripts": {
-    "coverage": "lab --assert code --reporter lcov --output lcov.info test",
     "lint": "eslint .",
     "start": "node server/index.js",
     "start-watch": "nodemon --watch server server/index.js",
-    "unit": "jest",
-    "unit-watch": "nodemon --watch . ./node_modules/.bin/jest",
-    "test": "lab --assert code",
-    "test-watch": "nodemon --watch . ./node_modules/.bin/lab --assert code"
+    "test": "jest",
+    "test-watch": "nodemon --watch . ./node_modules/.bin/jest"
   },
   "repository": {
     "type": "git",
@@ -46,11 +43,19 @@
   },
   "jest": {
     "collectCoverage": true,
+    "collectCoverageOnlyFrom": {
+      "client/index.js": true,
+      "client/lib/node.js": true,
+      "client/lib/association.js": true,
+      "server/lib/node.js": true,
+      "server/lib/association.js": true
+    },
     "unmockedModulePathPatterns": [
       "uuid",
       "object-assign",
       "101/*",
-      "boom"
+      "boom",
+      "methods"
     ]
   }
 }

@@ -1,8 +1,8 @@
 /* global jest describe it expect beforeEach afterEach */
 'use strict';
 
-jest.dontMock('../lib/node');
-var Node = require('../lib/node');
+jest.dontMock('../node');
+var Node = require('../node');
 var n;
 
 describe('Node creation', function () {

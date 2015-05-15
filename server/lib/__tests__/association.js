@@ -1,8 +1,8 @@
 /* global jest describe it expect beforeEach afterEach */
 'use strict';
 
-jest.dontMock('../lib/association');
-var Association = require('../lib/association');
+jest.dontMock('../association');
+var Association = require('../association');
 var a;
 
 describe('Association creation', function () {

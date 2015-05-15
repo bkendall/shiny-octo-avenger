@@ -6,9 +6,7 @@ sudo: false
 script:
   - npm run lint
   - npm test
-  - npm run unit
 after_success:
   - npm install -g codeclimate-test-reporter
   - npm run coverage
-  - codeclimate < lcov.info
   - codeclimate < coverage/lcov.info
