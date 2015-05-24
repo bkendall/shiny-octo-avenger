@@ -4,6 +4,7 @@
   "description": "graph database in javascript",
   "main": "index.js",
   "scripts": {
+    "docs": "jsdoc client/*",
     "lint": "eslint .",
     "start": "node server/index.js",
     "start-watch": "nodemon --watch server server/index.js",
