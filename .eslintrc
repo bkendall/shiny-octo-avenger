@@ -44,5 +44,5 @@ rules:
   spaced-line-comment: 2
   strict: 2
   use-isnan: 2
-  valid-jsdoc: 2
+  valid-jsdoc: [2, { "requireReturn": false }]
 
