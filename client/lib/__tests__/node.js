@@ -65,6 +65,48 @@ describe('Node', function () {
       });
     });
 
+    describe('update', function () {
+      it('should call to update information', function () {
+        SimpleApiClient.prototype.patch.mockImplementation(function () {
+          var cb = Array.prototype.slice.call(arguments).pop();
+          cb(null, { statusCode: 200 }, {});
+        });
+        n.update({ value: 'newValue' }, noop);
+        expect(SimpleApiClient.prototype.patch).toBeCalledWith(
+          'nodes/1',
+          {
+            json: true,
+            body: { value: 'newValue' }
+          },
+          noop);
+        SimpleApiClient.prototype.patch.mockClear();
+        noop.mockClear();
+
+        // err res
+        var e = new Error('some err');
+        SimpleApiClient.prototype.patch.mockImplementation(function () {
+          var cb = Array.prototype.slice.call(arguments).pop();
+          cb(e);
+        });
+        n.update({ value: 'newValue' }, noop);
+        expect(noop.mock.calls[0][0]).toBe(e);
+        SimpleApiClient.prototype.patch.mockClear();
+        noop.mockClear();
+
+        // valid response, non-200
+        SimpleApiClient.prototype.patch.mockImplementation(function () {
+          var cb = Array.prototype.slice.call(arguments).pop();
+          cb(null, { statusCode: 400 }, { message: 'bad request' });
+        });
+        n.update({ value: 'newValue' }, noop);
+        expect(noop.mock.calls[0][0].name).toBe('Error');
+        expect(noop.mock.calls[0][0].message)
+          .toBe('could not update node: bad request');
+        SimpleApiClient.prototype.patch.mockClear();
+        noop.mockClear();
+      });
+    });
+
     describe('delete', function () {
       it('should call to delete information', function () {
         SimpleApiClient.prototype.delete.mockImplementation(function () {

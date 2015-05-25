@@ -9,6 +9,7 @@
     "start": "node server/index.js",
     "start-watch": "nodemon --watch server server/index.js",
     "test": "jest",
+    "test-integration": "lab --assert code --verbose",
     "test-watch": "nodemon --watch . ./node_modules/.bin/jest"
   },
   "repository": {
@@ -38,7 +39,7 @@
     "eslint": "^0.21.0",
     "jest-cli": "^0.4.0",
     "jsdoc": "^3.3.0",
-    "lab": "^5.7.0",
+    "lab": "^5.9.0",
     "nodemon": "^1.3.7",
     "sinon": "^1.14.1"
   },

@@ -57,9 +57,12 @@ describe('Node', function () {
   });
 
   describe('new', function () {
-    it('creates a new node', function () {
+    it('creates a new node with opts', function () {
       // TODO I have no idea how to make sure a _Node_ was created
-      var n = c.newNode();
+      var n = c.newNode({
+        label: 'newLabel',
+        value: 'newValue'
+      });
       expect(n).toBeTruthy();
     });
   });
