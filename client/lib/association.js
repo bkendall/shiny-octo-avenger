@@ -1,6 +1,6 @@
 'use strict';
 
-var assign = require('object-assign');
+var assign = require('101/assign');
 
 module.exports = Association;
 

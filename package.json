@@ -22,14 +22,13 @@
   },
   "homepage": "https://github.com/bkendall/shiny-octo-avenger#readme",
   "dependencies": {
-    "101": "^0.18.0",
+    "101": "^1.0.0",
     "body-parser": "^1.12.3",
     "boom": "^2.7.1",
     "dat-middleware": "^1.10.3",
     "express": "^4.12.3",
     "middlewarize": "0.0.1",
     "morgan": "^1.5.2",
-    "object-assign": "^2.0.0",
     "simple-api-client": "^0.6.0",
     "uuid": "^2.0.1"
   },
@@ -54,7 +53,6 @@
     },
     "unmockedModulePathPatterns": [
       "uuid",
-      "object-assign",
       "101/*",
       "boom",
       "methods"

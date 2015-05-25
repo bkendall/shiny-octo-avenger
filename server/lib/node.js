@@ -1,6 +1,6 @@
 'use strict';
 
-var assign = require('object-assign');
+var assign = require('101/assign');
 var findIndex = require('101/find-index');
 var hasProps = require('101/has-properties');
 var boom = require('boom');
