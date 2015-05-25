@@ -34,6 +34,22 @@ Node.prototype.fetch = function (cb) {
   });
 };
 
+Node.prototype.update = function (update, cb) {
+  var self = this;
+  var opts = {
+    json: true,
+    body: update
+  };
+  this.graph.patch('nodes/' + this.id, opts, function (err, res, body) {
+    if (err) {
+      return cb(err);
+    } else if (res.statusCode !== 200) {
+      return cb(new Error('could not update node: ' + body.message));
+    }
+    cb(null, new Node(body, self.graph));
+  });
+};
+
 /**
  * Node delete
  * Delete the Node from the server

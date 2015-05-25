@@ -37,6 +37,11 @@ Node.find = function (opts, cb) {
   }
 };
 
+Node.prototype.update = function (opts, cb) {
+  assign(this, opts);
+  cb(null, this);
+};
+
 Node.prototype.delete = function (cb) {
   var i = findIndex(nodes, hasProps({ id: this.id }));
   nodes.splice(i, 1);

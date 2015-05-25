@@ -18,18 +18,39 @@ describe('Node creation', function () {
   });
 });
 
-describe('Node deletion', function () {
+describe('Node methods', function () {
   beforeEach(function () {
     n = new Node('another-test-node', 47);
   });
 
-  it('should delete nodes', function () {
-    n.delete(function (err) {
-      expect(err).toBeFalsy();
-      Node.find({}, function (fetchErr, nodes) {
-        expect(fetchErr).toBeFalsy();
-        expect(nodes).toBeTruthy();
-        expect(nodes.length).toEqual(0);
+  describe('Node update', function () {
+    afterEach(function () {
+      n.delete(function () {});
+    });
+
+    it('should update a node', function () {
+      n.update({ value: 'value' }, function (err, node) {
+        expect(err).toBeFalsy();
+        expect(node.value).toEqual('value');
+        Node.findOne({ id: n.id }, function (fetchErr, fetchedNode) {
+          expect(fetchErr).toBeFalsy();
+          expect(fetchedNode).toBeTruthy();
+          expect(fetchedNode.id).toEqual(n.id);
+          expect(fetchedNode.value).toEqual('value');
+        });
+      });
+    });
+  });
+
+  describe('Node deletion', function () {
+    it('should delete nodes', function () {
+      n.delete(function (err) {
+        expect(err).toBeFalsy();
+        Node.find({}, function (fetchErr, nodes) {
+          expect(fetchErr).toBeFalsy();
+          expect(nodes).toBeTruthy();
+          expect(nodes.length).toEqual(0);
+        });
       });
     });
   });

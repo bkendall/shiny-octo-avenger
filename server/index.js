@@ -31,6 +31,14 @@ app.get('/nodes/:id',
   mw.req('node').require(),
   mw.res.json('node'));
 
+app.patch('/nodes/:id',
+  mw.params('id').pick().require().string(),
+  mw.body({ or: [ 'label', 'value' ] }).pick().require().string(),
+  node.findOne({ id: 'params.id' }, 'cb').async('node'),
+  mw.req('node').require(),
+  node.instance.update('body', 'cb'),
+  mw.res.json('node'));
+
 app.delete('/nodes/:id',
   mw.params('id').pick().require().string(),
   node.findOne({ id: 'params.id' }, 'cb').async('node'),
