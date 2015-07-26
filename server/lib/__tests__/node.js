@@ -81,11 +81,11 @@ describe('Node static functions', function () {
       });
     });
 
-    it('should return an error if not found', function () {
-      Node.find({ id: '' }, function (err) {
-        expect(err).toBeTruthy();
-        expect(err.isBoom).toEqual(true);
-        expect(err.output.statusCode).toEqual(404);
+    it('should return an empty list if not found', function () {
+      Node.find({ id: '' }, function (err, nodes) {
+        expect(err).toBeFalsy();
+        expect(nodes).toBeTruthy();
+        expect(nodes.length).toEqual(0);
       });
     });
   });

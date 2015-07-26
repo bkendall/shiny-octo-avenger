@@ -21,20 +21,16 @@ function Node (label, value) {
 
 Node.findOne = function (opts, cb) {
   this.find(opts, function (err, _nodes) {
-    cb(err, err ? null : _nodes[0]);
+    if (err) { return cb(err); }
+    if (!_nodes.length) { return cb(boom.notFound('node does not exist')); }
+    cb(null, _nodes[0]);
   });
 };
 
 Node.find = function (opts, cb) {
-  if (Object.keys(opts).length === 0) {
-    return cb(null, nodes);
-  }
+  if (Object.keys(opts).length === 0) { return cb(null, nodes); }
   var n = nodes.filter(hasProps(opts));
-  if (!n.length) {
-    cb(boom.notFound('node does not exist'));
-  } else {
-    cb(null, n);
-  }
+  cb(null, n);
 };
 
 Node.prototype.update = function (opts, cb) {
@@ -47,4 +43,3 @@ Node.prototype.delete = function (cb) {
   nodes.splice(i, 1);
   cb(null);
 };
-

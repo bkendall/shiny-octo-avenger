@@ -19,6 +19,28 @@ function Client (host) {
 }
 
 /**
+ * Get nodes from the graph.
+ * @param {object} opts options to pass in the query
+ * @param {integer} opts.label Node label for which to search
+ * @param {integer} opts.value Node value for which to search
+ * @param {function} cb callback function
+ */
+Client.prototype.fetchNodes = function (opts, cb) {
+  if (isFunction(opts)) {
+    cb = opts;
+    opts = {};
+  }
+  opts = { qs: opts };
+  this.graph.get('nodes', opts, function (err, res, body) {
+    if (err) { return cb(err); }
+    if (res.statusCode !== 200) {
+      return cb(new Error('could not get nodes: ' + body.message));
+    }
+    cb(null, body);
+  });
+};
+
+/**
  * Get associations from the graph.
  * @param {object} opts options to pass in the query
  * @param {integer} opts.from Node ID from which to look for associations
@@ -112,9 +134,9 @@ function handleCreate (Entity, graph, cb) {
     if (err) {
       return cb(err);
     } else if (res.statusCode !== 201) {
+      console.error('Error Code', res.statusCode);
       return cb(new Error('could not create ' + Entity.name));
     }
     cb(null, new Entity(body, graph));
   };
 }
-
