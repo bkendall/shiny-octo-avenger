@@ -59,7 +59,8 @@ describe('Node', function () {
         });
         n.fetch(noop);
         expect(noop.mock.calls[0][0].name).toBe('Error');
-        expect(noop.mock.calls[0][0].message).toBe('could not fetch node');
+        expect(noop.mock.calls[0][0].message)
+          .toBe('could not fetch node (400)');
         SimpleApiClient.prototype.get.mockClear();
         noop.mockClear();
       });

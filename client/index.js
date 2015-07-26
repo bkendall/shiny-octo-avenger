@@ -26,6 +26,7 @@ function Client (host) {
  * @param {function} cb callback function
  */
 Client.prototype.fetchNodes = function (opts, cb) {
+  var self = this;
   if (isFunction(opts)) {
     cb = opts;
     opts = {};
@@ -34,9 +35,10 @@ Client.prototype.fetchNodes = function (opts, cb) {
   this.graph.get('nodes', opts, function (err, res, body) {
     if (err) { return cb(err); }
     if (res.statusCode !== 200) {
-      return cb(new Error('could not get nodes: ' + body.message));
+      return cb(new Error('could not get nodes (' + res.statusCode + '): ' +
+        body.message));
     }
-    cb(null, body);
+    cb(null, body.map(function (n) { return self.newNode(n); }));
   });
 };
 

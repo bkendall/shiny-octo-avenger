@@ -28,7 +28,7 @@ Node.prototype.fetch = function (cb) {
     if (err) {
       return cb(err);
     } else if (res.statusCode !== 200) {
-      return cb(new Error('could not fetch node'));
+      return cb(new Error('could not fetch node (' + res.statusCode + ')'));
     }
     cb(null, new Node(body, self.graph));
   });
@@ -65,4 +65,3 @@ Node.prototype.delete = function (cb) {
     cb(null);
   });
 };
-

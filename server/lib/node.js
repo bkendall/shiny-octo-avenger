@@ -1,9 +1,10 @@
 'use strict';
 
 var assign = require('101/assign');
+var boom = require('boom');
 var findIndex = require('101/find-index');
 var hasProps = require('101/has-properties');
-var boom = require('boom');
+var pick = require('101/pick');
 var uuid = require('uuid');
 
 module.exports = Node;
@@ -20,6 +21,7 @@ function Node (label, value) {
 }
 
 Node.findOne = function (opts, cb) {
+  opts = filterOpts(opts);
   this.find(opts, function (err, _nodes) {
     if (err) { return cb(err); }
     if (!_nodes.length) { return cb(boom.notFound('node does not exist')); }
@@ -28,6 +30,7 @@ Node.findOne = function (opts, cb) {
 };
 
 Node.find = function (opts, cb) {
+  opts = filterOpts(opts);
   if (Object.keys(opts).length === 0) { return cb(null, nodes); }
   var n = nodes.filter(hasProps(opts));
   cb(null, n);
@@ -43,3 +46,7 @@ Node.prototype.delete = function (cb) {
   nodes.splice(i, 1);
   cb(null);
 };
+
+function filterOpts (opts) {
+  return pick(opts, [ 'id', 'label', 'value' ]);
+}

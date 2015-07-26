@@ -16,7 +16,6 @@ app.use(require('morgan')('combined', {
 app.use(require('body-parser').json());
 
 app.get('/nodes',
-  mw.query({ or: [ 'label', 'value', 'id' ] }).pick().require().string(),
   node.find('query', 'cb').async('nodes'),
   mw.res.json('nodes'));
 
@@ -26,7 +25,6 @@ app.post('/nodes',
   mw.res.status(201), mw.res.json('node'));
 
 app.get('/nodes/:id',
-  mw.params('id').pick().require().string(),
   node.findOne({ id: 'params.id' }, 'cb').async('node'),
   mw.req('node').require(),
   mw.res.json('node'));
