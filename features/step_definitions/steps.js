@@ -53,4 +53,50 @@ module.exports = function () {
       }
     });
   });
+
+  this.When(/^I add an Association "([^"]*)" from "([^"]*)" "([^"]*)" to "([^"]*)" "([^"]*)"$/, function (arg1, arg2, arg3, arg4, arg5, callback) {
+    var self = this;
+    var node1Props = {
+      label: arg2,
+      value: arg3
+    };
+    var node2Props = {
+      label: arg4,
+      value: arg5
+    };
+    var label = arg1;
+    this.client.fetchNodes({}, function (err, nodes) {
+      if (err) { return callback.fail(err); }
+      var node1 = find(nodes, hasProps(node1Props));
+      var node2 = find(nodes, hasProps(node2Props));
+      self.client.createAssociation(node1, label, node2, callback);
+    });
+  });
+
+  this.Then(/^I should be able to see the that "([^"]*)" "([^"]*)" "([^"]*)" "([^"]*)" "([^"]*)"$/, function (arg1, arg2, arg3, arg4, arg5, callback) {
+    var self = this;
+    var node1Props = {
+      label: arg1,
+      value: arg2
+    };
+    var node2Props = {
+      label: arg4,
+      value: arg5
+    };
+    var label = arg3;
+    this.client.fetchNodes(node1Props, function (err, nodes) {
+      if (err) { return callback.fail(err); }
+      if (nodes.length !== 1) { return callback.fail('Did not receive nodes.'); }
+      self.client.fetchAssociations({
+        from: nodes[0].id,
+        label: label
+      }, function (err, associations) {
+        if (err) { return callback.fail(err); }
+        if (associations.length !== 1) { return callback.fail('Did not receive associations.'); }
+        var a = find(associations, hasProps({ label: label }));
+        if (!a) { return callback.fail('Did not have correct assocation.'); }
+        callback();
+      });
+    });
+  });
 };
