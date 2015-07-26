@@ -7,6 +7,7 @@ script:
   - npm run lint
   - npm test
   - npm run test-integration
+  - npm run test-features
 after_success:
   - npm install -g codeclimate-test-reporter
   - npm run coverage

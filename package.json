@@ -9,7 +9,8 @@
     "start": "node server/index.js",
     "start-watch": "nodemon --watch server server/index.js",
     "test": "jest",
-    "test-integration": "lab --assert code --verbose",
+    "test-features": "cucumber.js --format progress",
+    "test-integration": "lab --assert code",
     "test-watch": "nodemon --watch . ./node_modules/.bin/jest"
   },
   "repository": {
