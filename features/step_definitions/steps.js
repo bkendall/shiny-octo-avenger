@@ -45,7 +45,7 @@ module.exports = function () {
           }
           return callback();
         }
-      } else {
+      } else { // should not
         if (nodes.length !== 0) {
           return callback.fail('Recieved nodes when none were expected.');
         }
@@ -54,7 +54,7 @@ module.exports = function () {
     });
   });
 
-  this.When(/^I add an Association "([^"]*)" from "([^"]*)" "([^"]*)" to "([^"]*)" "([^"]*)"$/, function (arg1, arg2, arg3, arg4, arg5, callback) {
+  this.When(/^I (add|remove) an Association "([^"]*)" from "([^"]*)" "([^"]*)" to "([^"]*)" "([^"]*)"$/, function (arg0, arg1, arg2, arg3, arg4, arg5, callback) {
     var self = this;
     var node1Props = {
       label: arg2,
@@ -65,15 +65,26 @@ module.exports = function () {
       value: arg5
     };
     var label = arg1;
-    this.client.fetchNodes({}, function (err, nodes) {
-      if (err) { return callback.fail(err); }
-      var node1 = find(nodes, hasProps(node1Props));
-      var node2 = find(nodes, hasProps(node2Props));
-      self.client.createAssociation(node1, label, node2, callback);
-    });
+      this.client.fetchNodes({}, function (err, nodes) {
+        if (err) { return callback.fail(err); }
+        var node1 = find(nodes, hasProps(node1Props));
+        var node2 = find(nodes, hasProps(node2Props));
+        if (arg0 === 'add') {
+          self.client.createAssociation(node1, label, node2, callback);
+        } else { // remove
+          self.client.fetchAssociations({
+            from: node1.id,
+            label: label
+          }, function (err, associations) {
+            if (err) { return callback.fail(err); }
+            if (associations.length !== 1) { return callback.fail('Did not receive just one association.'); }
+            associations[0].delete(callback);
+          });
+        }
+      });
   });
 
-  this.Then(/^I should be able to see the that "([^"]*)" "([^"]*)" "([^"]*)" "([^"]*)" "([^"]*)"$/, function (arg1, arg2, arg3, arg4, arg5, callback) {
+  this.Then(/^I (should not|should) be able to see the that "([^"]*)" "([^"]*)" "([^"]*)" "([^"]*)" "([^"]*)"$/, function (arg0, arg1, arg2, arg3, arg4, arg5, callback) {
     var self = this;
     var node1Props = {
       label: arg1,
@@ -92,10 +103,15 @@ module.exports = function () {
         label: label
       }, function (err, associations) {
         if (err) { return callback.fail(err); }
-        if (associations.length !== 1) { return callback.fail('Did not receive associations.'); }
-        var a = find(associations, hasProps({ label: label }));
-        if (!a) { return callback.fail('Did not have correct assocation.'); }
-        callback();
+        if (arg0 === 'should') {
+          if (associations.length !== 1) { return callback.fail('Did not receive associations.'); }
+          var a = find(associations, hasProps({ label: label }));
+          if (!a) { return callback.fail('Did not have correct assocation.'); }
+          callback();
+        } else { // should not
+          if (associations.length !== 0) { return callback.fail('Found associations when none were expected.'); }
+          callback();
+        }
       });
     });
   });

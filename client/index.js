@@ -51,6 +51,7 @@ Client.prototype.fetchNodes = function (opts, cb) {
  * @param {function} cb callback function
  */
 Client.prototype.fetchAssociations = function (opts, cb) {
+  var self = this;
   if (isFunction(opts)) {
     cb = opts;
     opts = {};
@@ -62,7 +63,9 @@ Client.prototype.fetchAssociations = function (opts, cb) {
     } else if (res.statusCode !== 200) {
       return cb(new Error('could not get associations: ' + body.message));
     }
-    cb(null, body);
+    cb(null, body.map(function (a) {
+      return new Association(a, self.graph);
+    }));
   });
 };
 

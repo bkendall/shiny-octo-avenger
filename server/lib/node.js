@@ -32,8 +32,7 @@ Node.findOne = function (opts, cb) {
 Node.find = function (opts, cb) {
   opts = filterOpts(opts);
   if (Object.keys(opts).length === 0) { return cb(null, nodes); }
-  var n = nodes.filter(hasProps(opts));
-  cb(null, n);
+  cb(null, nodes.filter(hasProps(opts)));
 };
 
 Node.prototype.update = function (opts, cb) {

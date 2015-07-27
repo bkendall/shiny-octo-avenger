@@ -17,3 +17,18 @@ function Association (opts, graph) {
   assign(this, opts, { graph: graph });
 }
 
+/**
+ * Association delete
+ * Delete the Association from the server
+ * @param {function} cb callback function
+ */
+Association.prototype.delete = function (cb) {
+  this.graph.delete('associations/' + this.id, function (err, res, body) {
+    if (err) {
+      return cb(err);
+    } else if (res.statusCode !== 204) {
+      return cb(new Error('could not delete association: ' + body.message));
+    }
+    cb(null);
+  });
+};

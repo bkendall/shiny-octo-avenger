@@ -84,7 +84,7 @@ describe('Associations', function () {
       // valid response
       SimpleApiClient.prototype.get.mockImplementation(function () {
         var cb = Array.prototype.slice.call(arguments).pop();
-        cb(null, { statusCode: 200 }, {});
+        cb(null, { statusCode: 200 }, []);
       });
 
       // does it work w/ opts?
@@ -128,4 +128,3 @@ describe('Associations', function () {
     });
   });
 });
-
