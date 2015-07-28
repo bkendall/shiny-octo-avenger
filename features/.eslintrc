@@ -1,0 +1,6 @@
+env:
+  node: true
+
+rules:
+  new-cap: 0
+  max-len: 0

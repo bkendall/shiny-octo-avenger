@@ -1,4 +1,4 @@
-env: 
+env:
   node: true
 
 rules:
@@ -45,4 +45,3 @@ rules:
   strict: 2
   use-isnan: 2
   valid-jsdoc: [2, { "requireReturn": false }]
-

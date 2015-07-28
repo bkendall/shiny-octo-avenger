@@ -132,6 +132,16 @@ Client.prototype.createAssociation = function (from, label, to, cb) {
     handleCreate(Association, this.graph, cb));
 };
 
+/**
+ * Create an Association object
+ * @param {object} opts options for creating the Node
+ * @param {string} opts.id ID of the Node to represent
+ * @return {Node} a new Node
+ */
+Client.prototype.newAssociation = function (opts) {
+  return new Association(opts, this.graph);
+};
+
 // Nodes and Associations have similar create handlers; this is the helper
 // function to consolidate those handlers.
 function handleCreate (Entity, graph, cb) {
