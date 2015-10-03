@@ -1,19 +1,24 @@
-'use strict';
+/* @flow */
+import express from 'express';
+const app = express();
+export const server = app;
 
-var express = require('express');
-var app = module.exports = express();
+import bodyParser from 'body-parser';
+import envIs from '101/env-is';
+import middlewarize from 'middlewarize';
+import mw from 'dat-middleware';
+import morgan from 'morgan';
 
-var envIs = require('101/env-is');
-var middlewarize = require('middlewarize');
-var mw = require('dat-middleware');
+import _node from './lib/node';
+import _association from './lib/association';
 
-var node = middlewarize(require('./lib/node'));
-var association = middlewarize(require('./lib/association'));
+const node = middlewarize(_node);
+const association = middlewarize(_association);
 
-app.use(require('morgan')('combined', {
-  skip: function () { return envIs('test'); }
+app.use(morgan('combined', {
+  skip: () => (envIs('test'))
 }));
-app.use(require('body-parser').json());
+app.use(bodyParser.json());
 
 app.get('/nodes',
   mw.query({ or: [ 'label', 'value', 'id' ] }).pick().require().string(),
@@ -60,9 +65,7 @@ app.get('/associations',
     node.findOne({ id: 'query.from' }, 'cb').async('node'),
     association.fetch('node.id', 'query.label', 'cb').async('associations'),
     mw.res.json('associations')),
-  function (req, res, next) {
-    next(mw.Boom.notAcceptable());
-  });
+  (req, res, next) => { next(mw.Boom.notAcceptable()); });
 
 app.post('/associations',
   mw.body('from', 'label', 'to').require().pick().string(),
@@ -72,11 +75,10 @@ app.post('/associations',
   association.new('from.id', 'body.label', 'to.id'),
   mw.res.status(201), mw.res.json('association'));
 
-app.use(boomError);
-function boomError (err, req, res, next) { // eslint-disable-line no-unused-vars
+app.use((err, req, res, next) => { // eslint-disable-line no-unused-vars
   if (!err.isBoom) {
     err = mw.Boom.wrap(err, 500, 'Server Error');
   }
   res.status(err.output.statusCode);
   res.json(err.output.payload);
-}
+});

@@ -1,0 +1,14 @@
+[ignore]
+.*/lib/.*
+.*/dist/.*
+.*/coverage/.*
+.*/resources/.*
+.*/node_modules/.*
+.*/test/.*
+
+[include]
+
+[libs]
+node_modules/
+
+[options]
