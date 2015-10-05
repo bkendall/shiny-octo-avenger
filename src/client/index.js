@@ -1,20 +1,19 @@
-'use strict';
+/* @flow */
+import SimpleApiClient from 'simple-api-client';
+import isFunction from '101/is-function';
+import isObject from '101/is-object';
 
-var SimpleApiClient = require('simple-api-client');
-var isFunction = require('101/is-function');
-var isObject = require('101/is-object');
+import Association from './lib/association';
+import Node from './lib/node';
 
-var Association = require('./lib/association');
-var Node = require('./lib/node');
-
-module.exports = Client;
+export default Client;
 
 /**
  * Graph Client
  * @constructor
  * @param {string} host host (w/ optional port) of graph server
  */
-function Client (host) {
+function Client (host: string) {
   this.graph = new SimpleApiClient('http://' + host);
 }
 
@@ -26,7 +25,7 @@ function Client (host) {
  * @param {boolean} [opts.count] get the count of associations with given opts
  * @param {function} cb callback function
  */
-Client.prototype.fetchAssociations = function (opts, cb) {
+Client.prototype.fetchAssociations = function (opts: Object, cb: Function) {
   if (isFunction(opts)) {
     cb = opts;
     opts = {};
@@ -48,20 +47,13 @@ Client.prototype.fetchAssociations = function (opts, cb) {
  * @param {string} value a string to set as the value on the Node
  * @param {function} cb callback function
  */
-Client.prototype.createNode = function (label, value, cb) {
-  if (isFunction(label)) {
-    value = label;
-    label = null;
-  }
-  if (isFunction(value)) {
-    cb = value;
-    value = null;
-  }
+Client.prototype.createNode =
+function (label: string, value: string, cb: Function) {
   var opts = {
     json: true,
     body: {
-      label: label,
-      value: value
+      label,
+      value
     }
   };
   this.graph.post('nodes', opts, handleCreate(Node, this.graph, cb));

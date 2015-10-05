@@ -1,21 +1,16 @@
-/* global jest describe it expect */
-'use strict';
+import { assert } from 'chai';
+import Association from '../association';
 
-jest.dontMock('../association');
-var Association = require('../association');
-
-describe('Association', function () {
-  describe('constructor', function () {
-    it('should set opts provided', function () {
+describe('Association', () => {
+  describe('constructor', () => {
+    it('should set opts provided', () => {
       var association = new Association({ id: 1, party: true }, 'graph');
       var expected = {
         id: 1,
         party: true,
         graph: 'graph'
       };
-      Object.keys(expected).forEach(function (key) {
-        expect(association[key]).toBe(expected[key]);
-      });
+      assert.deepEqual(association, expected);
     });
   });
 });

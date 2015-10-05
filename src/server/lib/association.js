@@ -1,51 +1,42 @@
-'use strict';
+/* @flow */
+import assign from '101/assign';
+import findIndex from '101/find-index';
+import hasProps from '101/has-properties';
+import uuid from 'uuid';
 
-var assign = require('101/assign');
-var findIndex = require('101/find-index');
-var hasProps = require('101/has-properties');
-var isFunction = require('101/is-function');
-var uuid = require('uuid');
+export default Association;
 
-module.exports = Association;
+let associations = [];
 
-var associations = [];
-
-function Association (fromID, label, toID) {
+function Association (from: string, label: string, to: string) {
   assign(this, {
     id: uuid(),
-    from: fromID,
-    label: label,
-    to: toID
+    from,
+    label,
+    to
   });
   associations.push(this);
 }
 
-Association.fetch = function (fromID, label, cb) {
-  var _associations = associations
+Association.fetch = function (from: string, label: string, cb: Function) {
+  const _associations = associations
     .filter(hasProps({
-      from: fromID,
-      label: label
+      from,
+      label
     }));
   cb(null, _associations);
 };
 
-Association.count = function (fromID, label, cb) {
-  if (isFunction(label)) {
-    cb = label;
-    label = undefined;
+Association.count = function (opts: Object, cb: Function) {
+  if (!opts.label) {
+    delete opts.label;
   }
-  var opts = {
-    from: fromID
-  };
-  if (label) {
-    opts.label = label;
-  }
-  var _associations = associations.filter(hasProps(opts));
+  const _associations = associations.filter(hasProps(opts));
   cb(null, _associations.length);
 };
 
-Association.prototype.delete = function (cb) {
-  var i = findIndex(associations, hasProps({ id: this.id }));
+Association.prototype.delete = function (cb: Function) {
+  const i = findIndex(associations, hasProps({ id: this.id }));
   associations.splice(i, 1);
   cb(null);
 };

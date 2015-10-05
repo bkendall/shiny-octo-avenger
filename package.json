@@ -4,12 +4,14 @@
   "description": "graph database in javascript",
   "main": "index.js",
   "scripts": {
+    "build": "babel src --ignore __tests__ --out-dir dist/",
+    "check": "flow check",
     "docs": "jsdoc client/*",
     "lint": "eslint .",
     "preversion": ". ./resources/check-git.sh && npm test",
     "start": "node server/index.js",
     "start-watch": "nodemon --watch server server/index.js",
-    "test": "jest",
+    "test": "mocha $npm_package_options_mocha",
     "test-integration": "lab --assert code --verbose",
     "test-watch": "nodemon --watch . ./node_modules/.bin/jest"
   },
@@ -23,6 +25,9 @@
     "url": "https://github.com/bkendall/shiny-octo-avenger/issues"
   },
   "homepage": "https://github.com/bkendall/shiny-octo-avenger#readme",
+  "options": {
+    "mocha": "--require resources/mocha-bootload src/**/__tests__/**/*.js"
+  },
   "dependencies": {
     "101": "^1.0.0",
     "babel-runtime": "^5.8.25",
@@ -40,6 +45,7 @@
     "babel": "^5.8.23",
     "babel-core": "^5.8.25",
     "babel-eslint": "^4.1.3",
+    "chai": "^3.3.0",
     "code": "^1.4.0",
     "eslint": "^1.3.1",
     "eslint-plugin-babel": "^2.1.1",
@@ -47,6 +53,7 @@
     "jest-cli": "^0.5.8",
     "jsdoc": "^3.3.0",
     "lab": "^6.1.0",
+    "mocha": "^2.3.3",
     "nodemon": "^1.3.7",
     "sinon": "^1.14.1"
   },

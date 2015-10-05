@@ -1,8 +1,6 @@
-'use strict';
+import assign from '101/assign';
 
-var assign = require('101/assign');
-
-module.exports = Association;
+export default Association;
 
 /**
  * Graph Association

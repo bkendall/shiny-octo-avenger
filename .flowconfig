@@ -1,5 +1,4 @@
 [ignore]
-.*/lib/.*
 .*/dist/.*
 .*/coverage/.*
 .*/resources/.*
@@ -9,6 +8,6 @@
 [include]
 
 [libs]
-node_modules/
+./lib
 
 [options]

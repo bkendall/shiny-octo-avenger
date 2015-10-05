@@ -15,9 +15,7 @@ import _association from './lib/association';
 const node = middlewarize(_node);
 const association = middlewarize(_association);
 
-app.use(morgan('combined', {
-  skip: () => (envIs('test'))
-}));
+app.use(morgan('combined', { skip: () => (envIs('false')) }));
 app.use(bodyParser.json());
 
 app.get('/nodes',
