@@ -1,3 +1,5 @@
+'use strict';
+
 import assign from '101/assign';
 
 export default Node;

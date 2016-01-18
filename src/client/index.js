@@ -1,4 +1,5 @@
-/* @flow */
+'use strict';
+
 import SimpleApiClient from 'simple-api-client';
 import isFunction from '101/is-function';
 import isObject from '101/is-object';
@@ -13,7 +14,7 @@ export default Client;
  * @constructor
  * @param {string} host host (w/ optional port) of graph server
  */
-function Client (host: string) {
+function Client (host) {
   this.graph = new SimpleApiClient('http://' + host);
 }
 
@@ -25,13 +26,13 @@ function Client (host: string) {
  * @param {boolean} [opts.count] get the count of associations with given opts
  * @param {function} cb callback function
  */
-Client.prototype.fetchAssociations = function (opts: Object, cb: Function) {
+Client.prototype.fetchAssociations = function (opts, cb) {
   if (isFunction(opts)) {
     cb = opts;
     opts = {};
   }
   opts = { qs: opts };
-  this.graph.get('associations', opts, function (err, res, body) {
+  this.graph.get('associations', opts, (err, res, body) => {
     if (err) {
       return cb(err);
     } else if (res.statusCode !== 200) {
@@ -47,8 +48,10 @@ Client.prototype.fetchAssociations = function (opts: Object, cb: Function) {
  * @param {string} value a string to set as the value on the Node
  * @param {function} cb callback function
  */
-Client.prototype.createNode =
-function (label: string, value: string, cb: Function) {
+Client.prototype.createNode = function (label, value, cb) {
+  if (arguments.length !== 3) {
+    throw new Error('Label and Value are both required.');
+  }
   var opts = {
     json: true,
     body: {
@@ -100,7 +103,7 @@ Client.prototype.createAssociation = function (from, label, to, cb) {
 // Nodes and Associations have similar create handlers; this is the helper
 // function to consolidate those handlers.
 function handleCreate (Entity, graph, cb) {
-  return function (err, res, body) {
+  return (err, res, body) => {
     if (err) {
       return cb(err);
     } else if (res.statusCode !== 201) {

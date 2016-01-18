@@ -1,4 +1,5 @@
-node_modules
-lcov.info
 coverage
+dist
+lcov.info
+node_modules
 out

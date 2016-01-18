@@ -1,4 +1,5 @@
-/* @flow */
+'use strict';
+
 import assign from '101/assign';
 import findIndex from '101/find-index';
 import hasProps from '101/has-properties';
@@ -8,7 +9,7 @@ export default Association;
 
 let associations = [];
 
-function Association (from: string, label: string, to: string) {
+function Association (from, label, to) {
   assign(this, {
     id: uuid(),
     from,
@@ -18,7 +19,7 @@ function Association (from: string, label: string, to: string) {
   associations.push(this);
 }
 
-Association.fetch = function (from: string, label: string, cb: Function) {
+Association.fetch = function (from, label, cb) {
   const _associations = associations
     .filter(hasProps({
       from,
@@ -27,7 +28,7 @@ Association.fetch = function (from: string, label: string, cb: Function) {
   cb(null, _associations);
 };
 
-Association.count = function (opts: Object, cb: Function) {
+Association.count = function (opts, cb) {
   if (!opts.label) {
     delete opts.label;
   }
@@ -35,7 +36,7 @@ Association.count = function (opts: Object, cb: Function) {
   cb(null, _associations.length);
 };
 
-Association.prototype.delete = function (cb: Function) {
+Association.prototype.delete = function (cb) {
   const i = findIndex(associations, hasProps({ id: this.id }));
   associations.splice(i, 1);
   cb(null);

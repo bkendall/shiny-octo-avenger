@@ -1,69 +1,46 @@
-// /* global jest describe it expect beforeEach */
-// 'use strict';
+'use strict';
 
-// jest.dontMock('../index');
-// var Client = require('../index');
-// var c;
+import { assert } from 'chai';
+import sinon from 'sinon';
 
-// var SimpleApiClient = require('simple-api-client');
-// var noop = jest.genMockFunction();
+import Client from '../index';
+let c;
 
-// beforeEach(function () {
-//   c = new Client('localhost:3000');
-// });
+import SimpleApiClient from 'simple-api-client';
+let noop = sinon.stub().yieldsAsync();
 
-// describe('Node', function () {
-//   describe('create', function () {
-//     it('calls the graph to create nodes', function () {
-//       c.createNode('label', 'value', noop);
-//       expect(SimpleApiClient.prototype.post).toBeCalledWith(
-//         'nodes',
-//         {
-//           json: true,
-//           body: {
-//             label: 'label',
-//             value: 'value'
-//           }
-//         },
-//         noop);
-//       SimpleApiClient.prototype.post.mockClear();
+beforeEach(() => c = new Client('localhost:3000') );
 
-//       c.createNode('value', noop);
-//       expect(SimpleApiClient.prototype.post).toBeCalledWith(
-//         'nodes',
-//         {
-//           json: true,
-//           body: {
-//             label: 'value',
-//             value: null
-//           }
-//         },
-//         noop);
-//       SimpleApiClient.prototype.post.mockClear();
+describe('Node', () => {
+  describe('create', () => {
+    it('requires label and value', () => {
+      assert.throw(() => c.createNode(), /label.+value.+required/i);
+    });
 
-//       c.createNode(noop);
-//       expect(SimpleApiClient.prototype.post).toBeCalledWith(
-//         'nodes',
-//         {
-//           json: true,
-//           body: {
-//             label: null,
-//             value: null
-//           }
-//         },
-//         noop);
-//       SimpleApiClient.prototype.post.mockClear();
-//     });
-//   });
+    it('calls the graph to create nodes', () => {
+      sinon.stub(SimpleApiClient.prototype, 'post').yieldsAsync();
+      c.createNode('label', 'value', noop);
+      let postCall = SimpleApiClient.prototype.post.lastCall;
+      assert.equal(postCall.args[0], 'nodes');
+      assert.deepEqual(postCall.args[1], {
+        json: true,
+        body: {
+          label: 'label',
+          value: 'value'
+        }
+      });
+      SimpleApiClient.prototype.post.restore();
+    });
+  });
 
-//   describe('new', function () {
-//     it('creates a new node with opts', function () {
-//       // TODO I have no idea how to make sure a _Node_ was created
-//       var n = c.newNode({
-//         label: 'newLabel',
-//         value: 'newValue'
-//       });
-//       expect(n).toBeTruthy();
-//     });
-//   });
-// });
+  describe('new', () => {
+    it('creates a new node with opts', () => {
+      // TODO I have no idea how to make sure a _Node_ was created
+      var n = c.newNode({
+        label: 'newLabel',
+        value: 'newValue'
+      });
+      assert.ok(n);
+    });
+  });
+});

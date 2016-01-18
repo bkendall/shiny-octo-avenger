@@ -1,4 +1,5 @@
-/* @flow */
+'use strict';
+
 import assign from '101/assign';
 import boom from 'boom';
 import findIndex from '101/find-index';
@@ -9,7 +10,7 @@ export default Node;
 
 let nodes = [];
 
-function Node (label: string, value: any) {
+function Node (label, value) {
   assign(this, {
     id: uuid(),
     label,
@@ -18,13 +19,13 @@ function Node (label: string, value: any) {
   nodes.push(this);
 }
 
-Node.findOne = function (opts: Object, cb: Function) {
+Node.findOne = function (opts, cb) {
   this.find(opts, (err, _nodes) => {
     cb(err, err ? null : _nodes[0]);
   });
 };
 
-Node.find = function (opts: Object, cb: Function) {
+Node.find = function (opts, cb) {
   if (Object.keys(opts).length === 0) {
     return cb(null, nodes);
   }
@@ -36,12 +37,12 @@ Node.find = function (opts: Object, cb: Function) {
   }
 };
 
-Node.prototype.update = function (opts: Object, cb: Function) {
+Node.prototype.update = function (opts, cb) {
   assign(this, opts);
   cb(null, this);
 };
 
-Node.prototype.delete = function (cb: Function) {
+Node.prototype.delete = function (cb) {
   const i = findIndex(nodes, hasProps({ id: this.id }));
   nodes.splice(i, 1);
   cb(null);

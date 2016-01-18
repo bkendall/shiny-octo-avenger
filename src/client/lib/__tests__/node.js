@@ -7,9 +7,9 @@
 // var SimpleApiClient = require('simple-api-client');
 // var noop = jest.genMockFunction();
 
-// describe('Node', function () {
-//   describe('constructor', function () {
-//     it('should set opts provided', function () {
+// describe('Node', () => {
+//   describe('constructor', () => {
+//     it('should set opts provided', () => {
 //       var node = new Node({ id: 1, party: true }, 'graph');
 //       var expected = {
 //         id: 1,
@@ -22,15 +22,15 @@
 //     });
 //   });
 
-//   describe('methods', function () {
+//   describe('methods', () => {
 //     var n;
-//     beforeEach(function () {
+//     beforeEach(() => {
 //       n = new Node({ id: 1 }, new SimpleApiClient());
 //     });
 
-//     describe('fetch', function () {
-//       it('should call to fetch information', function () {
-//         SimpleApiClient.prototype.get.mockImplementation(function () {
+//     describe('fetch', () => {
+//       it('should call to fetch information', () => {
+//         SimpleApiClient.prototype.get.mockImplementation(() => {
 //           var cb = Array.prototype.slice.call(arguments).pop();
 //           cb(null, { statusCode: 200 }, {});
 //         });
@@ -43,7 +43,7 @@
 
 //         // err res
 //         var e = new Error('some err');
-//         SimpleApiClient.prototype.get.mockImplementation(function () {
+//         SimpleApiClient.prototype.get.mockImplementation(() => {
 //           var cb = Array.prototype.slice.call(arguments).pop();
 //           cb(e);
 //         });
@@ -53,7 +53,7 @@
 //         noop.mockClear();
 
 //         // valid response, non-200
-//         SimpleApiClient.prototype.get.mockImplementation(function () {
+//         SimpleApiClient.prototype.get.mockImplementation(() => {
 //           var cb = Array.prototype.slice.call(arguments).pop();
 //           cb(null, { statusCode: 400 }, {});
 //         });
@@ -65,9 +65,9 @@
 //       });
 //     });
 
-//     describe('update', function () {
-//       it('should call to update information', function () {
-//         SimpleApiClient.prototype.patch.mockImplementation(function () {
+//     describe('update', () => {
+//       it('should call to update information', () => {
+//         SimpleApiClient.prototype.patch.mockImplementation(() => {
 //           var cb = Array.prototype.slice.call(arguments).pop();
 //           cb(null, { statusCode: 200 }, {});
 //         });
@@ -84,7 +84,7 @@
 
 //         // err res
 //         var e = new Error('some err');
-//         SimpleApiClient.prototype.patch.mockImplementation(function () {
+//         SimpleApiClient.prototype.patch.mockImplementation(() => {
 //           var cb = Array.prototype.slice.call(arguments).pop();
 //           cb(e);
 //         });
@@ -94,7 +94,7 @@
 //         noop.mockClear();
 
 //         // valid response, non-200
-//         SimpleApiClient.prototype.patch.mockImplementation(function () {
+//         SimpleApiClient.prototype.patch.mockImplementation(() => {
 //           var cb = Array.prototype.slice.call(arguments).pop();
 //           cb(null, { statusCode: 400 }, { message: 'bad request' });
 //         });
@@ -107,9 +107,9 @@
 //       });
 //     });
 
-//     describe('delete', function () {
-//       it('should call to delete information', function () {
-//         SimpleApiClient.prototype.delete.mockImplementation(function () {
+//     describe('delete', () => {
+//       it('should call to delete information', () => {
+//         SimpleApiClient.prototype.delete.mockImplementation(() => {
 //           var cb = Array.prototype.slice.call(arguments).pop();
 //           cb(null, { statusCode: 204 }, {});
 //         });
@@ -122,7 +122,7 @@
 
 //         // err res
 //         var e = new Error('some err');
-//         SimpleApiClient.prototype.delete.mockImplementation(function () {
+//         SimpleApiClient.prototype.delete.mockImplementation(() => {
 //           var cb = Array.prototype.slice.call(arguments).pop();
 //           cb(e);
 //         });
@@ -132,7 +132,7 @@
 //         noop.mockClear();
 
 //         // valid response, non-204
-//         SimpleApiClient.prototype.delete.mockImplementation(function () {
+//         SimpleApiClient.prototype.delete.mockImplementation(() => {
 //           var cb = Array.prototype.slice.call(arguments).pop();
 //           cb(null, { statusCode: 400 }, { message: 'bad request' });
 //         });
